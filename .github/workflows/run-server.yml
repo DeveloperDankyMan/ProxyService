@@ -1,11 +1,9 @@
-name: Run Server Script  
+name: Run Server Script
 
 on:
-  # Schedule to run every hour (Adjust using cron syntax)
+  workflow_dispatch:
   schedule:
     - cron: '0 * * * *'
-  # Allows you to manually trigger it from the GitHub Actions tab
-  workflow_dispatch:
 
 jobs:
   run-script:
@@ -13,9 +11,6 @@ jobs:
     steps:
       - name: Checkout repository code
         uses: actions/checkout@v4
-        with:
-          # Automatically detects and pulls the active branch name
-          ref: ${{ github.ref_name }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -25,9 +20,16 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run script
+      - name: Install ngrok
+        run: npm install -g ngrok
+
+      - name: Start server and expose with ngrok
+        run: |
+          PORT=${{ secrets.PORT }} node server.js &
+          sleep 2
+          ngrok http 3000 --log=stdout
         env:
-          PORT: ${{ secrets.PORT }}
+          NGROK_AUTHTOKEN: ${{ secrets.NGROK_AUTHTOKEN }}
           ACCESS_KEY: ${{ secrets.ACCESS_KEY }}
-          GZIP_METHOD: "transform"
-        run: node server.js
+          PORT: ${{ secrets.PORT }}
+          GZIP_METHOD: transform
