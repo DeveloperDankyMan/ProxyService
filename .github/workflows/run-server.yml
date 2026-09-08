@@ -24,6 +24,6 @@ jobs:
 
       - name: Run script
         env:
-          ACCESS_KEY: "D6CCE35C-487A-458F-BAB2-9032C2621F38"
+          ACCESS_KEY: ${{ secrets.ACCESS_KEY }}
           GZIP_METHOD: "transform"
         run: node server.js
