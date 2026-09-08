@@ -1,4 +1,4 @@
-name: Run Server Script
+name: Run Server Script  
 
 on:
   # Schedule to run every hour (Adjust using cron syntax)
@@ -23,4 +23,7 @@ jobs:
         run: npm install
 
       - name: Run script
+        env:
+          ACCESS_KEY: "D6CCE35C-487A-458F-BAB2-9032C2621F38"
+          GZIP_METHOD: "transform"
         run: node server.js
