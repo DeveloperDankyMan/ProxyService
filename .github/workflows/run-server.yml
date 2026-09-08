@@ -33,3 +33,6 @@ jobs:
           ACCESS_KEY: ${{ secrets.ACCESS_KEY }}
           PORT: ${{ secrets.PORT }}
           GZIP_METHOD: transform
+          APPEND_HEAD: "true"
+          USE_WHITELIST: "false"
+          REWRITE_ACCEPT_ENCODING: "true"
