@@ -27,6 +27,7 @@ jobs:
 
       - name: Run script
         env:
+          PORT: ${{ secrets.PORT }}
           ACCESS_KEY: ${{ secrets.ACCESS_KEY }}
           GZIP_METHOD: "transform"
         run: node server.js
