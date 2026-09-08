@@ -224,6 +224,17 @@ const doProxy = (target, proto, req, res) => {
 };
 
 server.on('request', (req, res) => {
+  console.log(`\n=========================================`);
+  console.log(`[${new Date().toISOString()}] INCOMING REQUEST`);
+  console.log(`Method:  ${req.method}`);
+  console.log(`URL/Path: ${req.url}`);
+  console.log(`Headers:`);
+  console.log(`  -> proxy-target: ${req.headers['proxy-target'] || 'MISSING'}`);
+  console.log(`  -> proxy-access-key: ${req.headers['proxy-access-key'] ? 'PRESENT (Hidden for security)' : 'MISSING'}`);
+  console.log(`  -> proxy-target-override-method: ${req.headers['proxy-target-override-method'] || 'None'}`);
+  console.log(`  -> proxy-target-override-proto: ${req.headers['proxy-target-override-proto'] || 'None'}`);
+  console.log(`=========================================\n`);
+  
   const method = req.headers['proxy-target-override-method'];
   if (method) {
     if (ALLOWED_METHODS.includes(method)) {
