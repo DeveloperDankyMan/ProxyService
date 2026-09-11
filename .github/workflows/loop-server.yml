@@ -13,9 +13,11 @@ jobs:
   trigger-next-run:
     runs-on: ubuntu-latest
     steps:
-      - name: Cancel existing active server runs
+      - name: Cancel and Delete existing active server runs
         run: |
-          echo "Checking for active runs..."
+          echo "Checking for active runs of 'Run Server Script'..."
+          
+          # Fetch the IDs of any currently running or queued jobs
           ACTIVE_RUNS=$(gh run list \
             --repo ${{ github.repository }} \
             --workflow "Run Server Script" \
@@ -29,6 +31,9 @@ jobs:
             for RUN_ID in $ACTIVE_RUNS; do
               echo "Canceling old duplicate active run: $RUN_ID"
               gh run cancel --repo ${{ github.repository }} "$RUN_ID" || true
+              
+              echo "Deleting old run history from dashboard: $RUN_ID"
+              gh run delete --repo ${{ github.repository }} "$RUN_ID" || true
             done
             sleep 10
           fi
