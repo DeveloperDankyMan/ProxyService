@@ -1,0 +1,17 @@
+name: Loop Server Worker
+on:
+  workflow_run:
+    workflows: ["Run Server Script"] # Looks for the name of your main workflow
+    types:
+      - completed # Triggers on BOTH success, failure, or timeout
+
+jobs:
+  trigger-next-run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger main workflow to run again
+        run: |
+          # Uses the built-in GitHub CLI to dispatch a new workflow run
+          gh workflow run "Run Server Script" --ref ${{ github.event.workflow_run.head_branch }}
+        env:
+          GH_TOKEN: ${{ github.token }}
