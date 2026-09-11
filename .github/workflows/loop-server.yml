@@ -5,7 +5,6 @@ on:
     types:
       - completed
 
-# THIS BLOCK IS REQUIRED: It explicitly grants the token permission to trigger actions
 permissions:
   actions: write
   contents: write
@@ -14,8 +13,34 @@ jobs:
   trigger-next-run:
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger main workflow to run again
+      - name: Cancel existing active server runs
         run: |
+          echo "Checking for active runs of 'Run Server Script'..."
+          
+          # Fetch the IDs of any currently running or queued jobs for this workflow
+          ACTIVE_RUNS=$(gh run list \
+            --repo ${{ github.repository }} \
+            --workflow "Run Server Script" \
+            --status in_progress \
+            --json databaseId \
+            --jq '.[].databaseId')
+          
+          if [ -z "$ACTIVE_RUNS" ]; then
+            echo "No duplicate active runs found."
+          else
+            for RUN_ID in $ACTIVE_RUNS; do
+              echo "Canceling old duplicate active run: $RUN_ID"
+              gh run cancel --repo ${{ github.repository }} "$RUN_ID" || true
+            done
+            # Small buffer to let GitHub process the cancellation requests
+            sleep 10
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.MY_PAT || github.token }}
+
+      - name: Trigger main workflow to run a fresh copy
+        run: |
+          echo "Starting a fresh instance..."
           gh workflow run "Run Server Script" \
             --repo ${{ github.repository }} \
             --ref ${{ github.event.workflow_run.head_branch }}
