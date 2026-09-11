@@ -5,13 +5,17 @@ on:
     types:
       - completed
 
+# THIS BLOCK IS REQUIRED: It explicitly grants the token permission to trigger actions
+permissions:
+  actions: write
+  contents: write
+
 jobs:
   trigger-next-run:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger main workflow to run again
         run: |
-          # Explicitly passing the repository fixes the "not a git repository" error
           gh workflow run "Run Server Script" \
             --repo ${{ github.repository }} \
             --ref ${{ github.event.workflow_run.head_branch }}
