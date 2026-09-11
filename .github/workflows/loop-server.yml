@@ -1,9 +1,9 @@
 name: Loop Server Worker
 on:
   workflow_run:
-    workflows: ["Run Server Script"] # Looks for the name of your main workflow
+    workflows: ["Run Server Script"]
     types:
-      - completed # Triggers on BOTH success, failure, or timeout
+      - completed
 
 jobs:
   trigger-next-run:
@@ -11,7 +11,9 @@ jobs:
     steps:
       - name: Trigger main workflow to run again
         run: |
-          # Uses the built-in GitHub CLI to dispatch a new workflow run
-          gh workflow run "Run Server Script" --ref ${{ github.event.workflow_run.head_branch }}
+          # Explicitly passing the repository fixes the "not a git repository" error
+          gh workflow run "Run Server Script" \
+            --repo ${{ github.repository }} \
+            --ref ${{ github.event.workflow_run.head_branch }}
         env:
           GH_TOKEN: ${{ github.token }}
