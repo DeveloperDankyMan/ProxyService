@@ -12,6 +12,11 @@ permissions:
 jobs:
   trigger-next-run:
     runs-on: ubuntu-latest
+    # 1. ONLY execution when the run is officially stopped or canceled
+    if: >
+      github.event.workflow_run.conclusion == 'success' ||
+      github.event.workflow_run.conclusion == 'failure' ||
+      github.event.workflow_run.conclusion == 'cancelled'
     steps:
       - name: Cancel and Delete existing active server runs
         run: |
@@ -39,6 +44,12 @@ jobs:
           fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # 2. Cool-down step ensures GitHub backend catches up before launching a new container
+      - name: Wait for previous container cleanup
+        run: |
+          echo "Waiting 15 seconds to ensure old workflows are fully cleared..."
+          sleep 15
 
       - name: Trigger main workflow to run a fresh copy
         run: |
